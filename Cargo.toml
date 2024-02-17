@@ -8,7 +8,7 @@ name = "acl"
 version = "0.0.1"
 authors = ["uutils developers"]
 license = "MIT"
-description = "acl ~ GNU acl (updated); implemented as universal (cross-platform) utils, written in Rust"
+description = "acl ~ GNU acl; implemented as universal (cross-platform) utils, written in Rust"
 default-run = "acl"
 
 homepage = "https://github.com/uutils/acl"
