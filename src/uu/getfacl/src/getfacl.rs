@@ -4,11 +4,11 @@
 // file that was distributed with this source code.
 
 use clap::{crate_version, Arg, ArgAction, Command};
-use uucore::{error::UResult, help_about, help_usage};
-use xattr;
 use std::fs;
 use std::os::unix::fs::{MetadataExt, PermissionsExt};
-use users::{get_user_by_uid, get_group_by_gid};
+use users::{get_group_by_gid, get_user_by_uid};
+use uucore::{error::UResult, help_about, help_usage};
+use xattr;
 
 const ABOUT: &str = help_about!("getfacl.md");
 const USAGE: &str = help_usage!("getfacl.md");
@@ -27,18 +27,24 @@ fn print_file_acl(file_path: &str) -> std::io::Result<()> {
     // Fetching and formatting file permissions
     let perms = metadata.permissions();
     let mode = perms.mode();
-    let user_perms = format!("{}{}{}",
-                             if mode & 0o400 != 0 { "r" } else { "-" },
-                             if mode & 0o200 != 0 { "w" } else { "-" },
-                             if mode & 0o100 != 0 { "x" } else { "-" });
-    let group_perms = format!("{}{}{}",
-                              if mode & 0o040 != 0 { "r" } else { "-" },
-                              if mode & 0o020 != 0 { "w" } else { "-" },
-                              if mode & 0o010 != 0 { "x" } else { "-" });
-    let other_perms = format!("{}{}{}",
-                              if mode & 0o004 != 0 { "r" } else { "-" },
-                              if mode & 0o002 != 0 { "w" } else { "-" },
-                              if mode & 0o001 != 0 { "x" } else { "-" });
+    let user_perms = format!(
+        "{}{}{}",
+        if mode & 0o400 != 0 { "r" } else { "-" },
+        if mode & 0o200 != 0 { "w" } else { "-" },
+        if mode & 0o100 != 0 { "x" } else { "-" }
+    );
+    let group_perms = format!(
+        "{}{}{}",
+        if mode & 0o040 != 0 { "r" } else { "-" },
+        if mode & 0o020 != 0 { "w" } else { "-" },
+        if mode & 0o010 != 0 { "x" } else { "-" }
+    );
+    let other_perms = format!(
+        "{}{}{}",
+        if mode & 0o004 != 0 { "r" } else { "-" },
+        if mode & 0o002 != 0 { "w" } else { "-" },
+        if mode & 0o001 != 0 { "x" } else { "-" }
+    );
 
     // Generating the output
     println!("# file: {}", file_path);
