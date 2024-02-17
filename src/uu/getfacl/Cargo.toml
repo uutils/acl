@@ -1,0 +1,17 @@
+[package]
+name = "uu_getfacl"
+version = "0.0.1"
+edition = "2021"
+
+[dependencies]
+uucore = { workspace = true }
+clap = { workspace = true }
+xattr = { workspace = true }
+users = { workspace = true }
+
+[lib]
+path = "src/getfacl.rs"
+
+[[bin]]
+name = "getfacl"
+path = "src/main.rs"
