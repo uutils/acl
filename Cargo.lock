@@ -19,11 +19,11 @@ dependencies = [
  "rlimit",
  "tempfile",
  "textwrap",
- "users",
  "uu_chacl",
  "uu_getfacl",
  "uu_setfacl",
  "uucore",
+ "uzers",
  "xattr",
 ]
 
@@ -556,16 +556,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e51733f11c9c4f72aa0c160008246859e340b00807569a0da0e7a1079b27ba85"
 
 [[package]]
-name = "users"
-version = "0.11.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "24cc0f6d6f267b73e5a2cadf007ba8f9bc39c6a6f9666f8cf25ea809a153b032"
-dependencies = [
- "libc",
- "log",
-]
-
-[[package]]
 name = "utf8parse"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -584,8 +574,8 @@ name = "uu_getfacl"
 version = "0.0.1"
 dependencies = [
  "clap",
- "users",
  "uucore",
+ "uzers",
  "xattr",
 ]
 
@@ -629,6 +619,16 @@ name = "uuhelp_parser"
 version = "0.0.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d841f8408028085ca65896cdd60b9925d4e407cb69989a64889f2bebbb51147b"
+
+[[package]]
+name = "uzers"
+version = "0.11.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "76d283dc7e8c901e79e32d077866eaf599156cbf427fffa8289aecc52c5c3f63"
+dependencies = [
+ "libc",
+ "log",
+]
 
 [[package]]
 name = "wasi"
