@@ -15,7 +15,7 @@ edition = "2021"
 uucore = { workspace = true }
 clap = { workspace = true }
 xattr = { workspace = true }
-users = { workspace = true }
+uzers = { workspace = true }
 
 [lib]
 path = "src/getfacl.rs"
