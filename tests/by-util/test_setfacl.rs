@@ -8,5 +8,6 @@ use crate::common::util::TestScenario;
 
 #[test]
 fn test_invalid_arg() {
-    new_ucmd!().arg("--definitely-invalid").fails().code_is(101);
+    // TODO: clap sets an exit code of 1 by default, however, setfacl returns 2
+    new_ucmd!().arg("--definitely-invalid").fails().code_is(1);
 }
