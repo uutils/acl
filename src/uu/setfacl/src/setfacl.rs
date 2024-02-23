@@ -106,5 +106,10 @@ pub fn uu_app() -> Command {
         .arg(Arg::new("test").long("test").help(
             "Test mode. Instead of changing the ACLs of any files, the resulting ACLs are listed",
         ))
-        .arg(Arg::new("option").action(ArgAction::Set).num_args(0..))
+        .arg(
+            Arg::new("option")
+                .action(ArgAction::Set)
+                .num_args(0..)
+                .last(true),
+        )
 }
