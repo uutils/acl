@@ -6,7 +6,7 @@
 use clap::{crate_version, Arg, ArgAction, Command};
 use std::fs;
 use std::os::unix::fs::{MetadataExt, PermissionsExt};
-use users::{get_group_by_gid, get_user_by_uid};
+use uzers::{get_group_by_gid, get_user_by_uid};
 use uucore::{error::UResult, help_about, help_usage};
 
 const ABOUT: &str = help_about!("getfacl.md");

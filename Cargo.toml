@@ -47,7 +47,7 @@ tempfile = "3.10.0"
 rand = { version = "0.8", features = ["small_rng"] }
 utmpx = "0.2"
 clap_mangen = "0.2.20"
-users = "0.11"
+uzers = "0.11"
 
 [dependencies]
 clap = { workspace = true }
@@ -57,7 +57,7 @@ uucore = { workspace = true }
 phf = { workspace = true }
 textwrap = { workspace = true }
 xattr = { workspace = true }
-users = { workspace = true }
+uzers = { workspace = true }
 
 
 #
