@@ -213,6 +213,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
+name = "lazy_static"
+version = "1.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
+
+[[package]]
 name = "libc"
 version = "0.2.170"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -325,9 +331,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.78"
+version = "1.0.94"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e2422ad645d89c99f8f3e6b88a9fdeca7fabeac836b1002371c4367c8f984aae"
+checksum = "a31971752e70b8b2686d7e46ec17fb38dad4051d94024c88df49b667caea9c84"
 dependencies = [
  "unicode-ident",
 ]
@@ -356,9 +362,9 @@ dependencies = [
 
 [[package]]
 name = "quote"
-version = "1.0.35"
+version = "1.0.39"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "291ec9ab5efd934aaf503a6466c5d5251535d108ee747472c3977cc5acc868ef"
+checksum = "c1f1914ce909e1658d9907913b4b91947430c7d9be598b15a1912935b8c04801"
 dependencies = [
  "proc-macro2",
 ]
@@ -562,12 +568,13 @@ dependencies = [
 
 [[package]]
 name = "uucore"
-version = "0.0.28"
+version = "0.0.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "04ea43050c46912575654c5181f4135529e8d4003fca80803af10cdef3ca6412"
+checksum = "50e0dc1598d959a08f24cea4d9e992f7ca874bd4ac80746683272afd37603b5e"
 dependencies = [
  "clap",
  "glob",
+ "lazy_static",
  "libc",
  "nix",
  "number_prefix",
@@ -579,9 +586,9 @@ dependencies = [
 
 [[package]]
 name = "uucore_procs"
-version = "0.0.24"
+version = "0.0.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3eb9aeeb06d1f15c5b3b51acddddf3436e3e1480902b2a200618ca5dbb24e392"
+checksum = "27d3de33ab2b56c0437cca084a2aeb1d46c56d138ab6341c009a90018a9a1c5f"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -590,9 +597,9 @@ dependencies = [
 
 [[package]]
 name = "uuhelp_parser"
-version = "0.0.24"
+version = "0.0.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d841f8408028085ca65896cdd60b9925d4e407cb69989a64889f2bebbb51147b"
+checksum = "0cf4c8b31abfb5dc79940d6ca8000a1a6aa42f38711cdeaacb95850c69924cbc"
 
 [[package]]
 name = "uzers"
