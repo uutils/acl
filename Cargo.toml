@@ -38,7 +38,6 @@ clap_mangen = "0.2.20"
 libc = "0.2.154"
 phf = "0.11.2"
 phf_codegen = "0.11.2"
-rand = { version = "0.8.5", features = ["small_rng"] }
 regex = "1.10.4"
 tempfile = "3.10.1"
 textwrap = { version = "0.16.1", features = ["terminal_size"] }
@@ -68,7 +67,6 @@ setfacl = { optional = true, version = "0.0.1", package = "uu_setfacl", path = "
 ctor = "0.4.1"
 libc = { workspace = true }
 pretty_assertions = "1.4.0"
-rand = { workspace = true }
 regex = { workspace = true }
 tempfile = { workspace = true }
 uucore = { workspace = true, features = ["entries", "process", "signals"] }
