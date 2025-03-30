@@ -9,7 +9,7 @@ homepage = "https://github.com/uutils/acl"
 repository = "https://github.com/uutils/acl/tree/main/src/uu/setfacl"
 keywords = ["acl", "uutils", "cross-platform", "cli", "utility"]
 categories = ["command-line-utilities"]
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 uucore = { workspace = true }
