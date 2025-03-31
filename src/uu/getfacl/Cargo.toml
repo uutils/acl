@@ -1,15 +1,16 @@
 [package]
 name = "uu_getfacl"
-version = "0.0.1"
-authors = ["uutils developers"]
-license = "MIT"
 description = "getfacl ~ (uutils) Get file access control lists"
-
-homepage = "https://github.com/uutils/acl"
 repository = "https://github.com/uutils/acl/tree/main/src/uu/setfacl"
-keywords = ["acl", "uutils", "cross-platform", "cli", "utility"]
-categories = ["command-line-utilities"]
-edition = "2024"
+
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+
+homepage.workspace = true
+keywords.workspace = true
+categories.workspace = true
 
 [dependencies]
 uucore = { workspace = true }
