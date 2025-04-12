@@ -3,21 +3,31 @@
 
 # spell-checker:ignore (libs) bigdecimal datetime fundu gethostid kqueue libselinux mangen memmap procfs uuhelp
 
-[package]
-name = "acl"
+[workspace.package]
 version = "0.0.1"
 authors = ["uutils developers"]
 license = "MIT"
-description = "acl ~ GNU acl; implemented as universal (cross-platform) utils, written in Rust"
-default-run = "acl"
+edition = "2024"
 
 homepage = "https://github.com/uutils/acl"
-repository = "https://github.com/uutils/acl"
-readme = "README.md"
 keywords = ["acl", "uutils", "cross-platform", "cli", "utility"]
 categories = ["command-line-utilities"]
-rust-version = "1.70.0"
-edition = "2021"
+
+[package]
+name = "acl"
+description = "acl ~ GNU acl; implemented as universal (cross-platform) utils, written in Rust"
+default-run = "acl"
+repository = "https://github.com/uutils/acl"
+readme = "README.md"
+
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+
+homepage.workspace = true
+keywords.workspace = true
+categories.workspace = true
 
 build = "build.rs"
 
