@@ -46,12 +46,12 @@ fn print_file_acl(file_path: &str) -> std::io::Result<()> {
     );
 
     // Generating the output
-    println!("# file: {}", file_path);
-    println!("# owner: {}", owner);
-    println!("# group: {}", group);
-    println!("user::{}", user_perms);
-    println!("group::{}", group_perms);
-    println!("other::{}", other_perms);
+    println!("# file: {file_path}");
+    println!("# owner: {owner}");
+    println!("# group: {group}");
+    println!("user::{user_perms}");
+    println!("group::{group_perms}");
+    println!("other::{other_perms}");
 
     Ok(())
 }
@@ -81,7 +81,7 @@ pub fn uumain(args: impl uucore::Args) -> UResult<()> {
                         }
                     }
                 }
-                Err(e) => println!("Error listing attributes for file {}: {}", file, e),
+                Err(e) => println!("Error listing attributes for file {file}: {e}"),
             }
         }
     }
