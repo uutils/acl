@@ -18,7 +18,7 @@ pub fn uumain(args: impl uucore::Args) -> UResult<()> {
 
     println!("setfacl options selected:");
     for option in matches.get_many::<String>("option").unwrap_or_default() {
-        println!("Option: {}", option);
+        println!("Option: {option}");
     }
 
     Ok(())

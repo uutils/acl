@@ -15,7 +15,7 @@ pub fn uumain(args: impl uucore::Args) -> UResult<()> {
     // Example: Handle pathname arguments
     if let Some(pathnames) = matches.get_many::<String>("pathname") {
         for pathname in pathnames {
-            println!("Would change ACL for pathname: {}", pathname);
+            println!("Would change ACL for pathname: {pathname}");
             // Here you would implement the logic to change the ACLs
         }
     }
