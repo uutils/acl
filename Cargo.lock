@@ -129,9 +129,9 @@ dependencies = [
 
 [[package]]
 name = "clap_complete"
-version = "4.5.55"
+version = "4.5.56"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a5abde44486daf70c5be8b8f8f1b66c49f86236edf6fa2abadb4d961c4c6229a"
+checksum = "67e4efcbb5da11a92e8a609233aa1e8a7d91e38de0be865f016d14700d45a7fd"
 dependencies = [
  "clap",
 ]
@@ -234,7 +234,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "976dd42dc7e85965fe702eb8164f21f450704bdde31faefd6471dba214cb594e"
 dependencies = [
  "libc",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -621,7 +621,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys 0.4.15",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -634,7 +634,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys 0.9.4",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -718,7 +718,7 @@ dependencies = [
  "getrandom",
  "once_cell",
  "rustix 1.0.5",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
