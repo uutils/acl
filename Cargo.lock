@@ -22,7 +22,7 @@ dependencies = [
  "uu_chacl",
  "uu_getfacl",
  "uu_setfacl",
- "uucore 0.1.0",
+ "uucore",
  "uutests",
  "uzers",
  "xattr",
@@ -934,7 +934,7 @@ name = "uu_chacl"
 version = "0.0.1"
 dependencies = [
  "clap",
- "uucore 0.1.0",
+ "uucore",
 ]
 
 [[package]]
@@ -942,7 +942,7 @@ name = "uu_getfacl"
 version = "0.0.1"
 dependencies = [
  "clap",
- "uucore 0.1.0",
+ "uucore",
  "uzers",
  "xattr",
 ]
@@ -952,26 +952,7 @@ name = "uu_setfacl"
 version = "0.0.1"
 dependencies = [
  "clap",
- "uucore 0.1.0",
-]
-
-[[package]]
-name = "uucore"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9032bf981784f22fcc5ddc7e74b7cf3bae3d5f44a48d2054138ed38068b9f4e0"
-dependencies = [
- "clap",
- "fluent",
- "fluent-bundle",
- "libc",
- "nix",
- "number_prefix",
- "os_display",
- "thiserror",
- "unic-langid",
- "uucore_procs 0.1.0",
- "wild",
+ "uucore",
 ]
 
 [[package]]
@@ -994,19 +975,8 @@ dependencies = [
  "thiserror",
  "time",
  "unic-langid",
- "uucore_procs 0.2.0",
+ "uucore_procs",
  "wild",
-]
-
-[[package]]
-name = "uucore_procs"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c933945fdac5b7779eae1fc746146e61f5b0298deb6ede002ce0b6e93e1b3bfc"
-dependencies = [
- "proc-macro2",
- "quote",
- "uuhelp_parser 0.1.0",
 ]
 
 [[package]]
@@ -1017,14 +987,8 @@ checksum = "8624767e57fc437268b166c09c8f6d1461bf7dc8ffe86b4f0bd3b36aca1253bc"
 dependencies = [
  "proc-macro2",
  "quote",
- "uuhelp_parser 0.2.0",
+ "uuhelp_parser",
 ]
-
-[[package]]
-name = "uuhelp_parser"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "beda381dd5c7927f8682f50b055b0903bb694ba5a4b27fad1b4934bc4fbf7b8d"
 
 [[package]]
 name = "uuhelp_parser"
@@ -1046,7 +1010,7 @@ dependencies = [
  "regex",
  "rlimit",
  "tempfile",
- "uucore 0.2.0",
+ "uucore",
  "xattr",
 ]
 
