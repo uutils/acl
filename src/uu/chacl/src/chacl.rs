@@ -3,10 +3,7 @@
 // For the full copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 use clap::{Arg, ArgAction, Command, crate_version};
-use uucore::{error::UResult, help_about, help_usage};
-
-const ABOUT: &str = help_about!("chacl.md");
-const USAGE: &str = help_usage!("chacl.md");
+use uucore::error::UResult;
 
 #[uucore::main]
 pub fn uumain(args: impl uucore::Args) -> UResult<()> {
@@ -24,9 +21,18 @@ pub fn uumain(args: impl uucore::Args) -> UResult<()> {
 }
 
 pub fn uu_app() -> Command {
+    const USAGE: &str = "chacl acl pathname...
+       chacl -b acl dacl pathname...
+       chacl -d dacl pathname...
+       chacl -R pathname...
+       chacl -D pathname...
+       chacl -B pathname...
+       chacl -l pathname...
+       chacl -r pathname...";
+
     Command::new(uucore::util_name())
         .version(crate_version!())
-        .about(ABOUT)
+        .about("Change the access control list of a file or directory")
         .override_usage(USAGE)
         .arg(Arg::new("acl")
              .help("ACL string to apply")
