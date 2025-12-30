@@ -4,10 +4,7 @@
 // file that was distributed with this source code.
 
 use clap::{Arg, ArgAction, Command, crate_version};
-use uucore::{error::UResult, help_about, help_usage};
-
-const ABOUT: &str = help_about!("setfacl.md");
-const USAGE: &str = help_usage!("setfacl.md");
+use uucore::error::UResult;
 
 #[uucore::main]
 pub fn uumain(args: impl uucore::Args) -> UResult<()> {
@@ -25,9 +22,12 @@ pub fn uumain(args: impl uucore::Args) -> UResult<()> {
 }
 
 pub fn uu_app() -> Command {
+    const USAGE: &str = "setfacl [-bkndRLPvh] [{-m|-x} acl_spec] [{-M|-X} acl_file] file ...
+       setfacl --restore={file|-}";
+
     Command::new(uucore::util_name())
         .version(crate_version!())
-        .about(ABOUT)
+        .about("Set file access control lists")
         .override_usage(USAGE)
         .arg(
             Arg::new("modify")

@@ -6,11 +6,8 @@
 use clap::{Arg, ArgAction, Command, crate_version};
 use std::fs;
 use std::os::unix::fs::{MetadataExt, PermissionsExt};
-use uucore::{error::UResult, help_about, help_usage};
+use uucore::error::UResult;
 use uzers::{get_group_by_gid, get_user_by_uid};
-
-const ABOUT: &str = help_about!("getfacl.md");
-const USAGE: &str = help_usage!("getfacl.md");
 
 fn print_file_acl(file_path: &str) -> std::io::Result<()> {
     let metadata = fs::metadata(file_path)?;
@@ -89,9 +86,12 @@ pub fn uumain(args: impl uucore::Args) -> UResult<()> {
     Ok(())
 }
 pub fn uu_app() -> Command {
+    const USAGE: &str = "getfacl [-aceEsRLPtpndvh] file ...
+       getfacl [-aceEsRLPtpndvh] -";
+
     Command::new(uucore::util_name())
         .version(crate_version!())
-        .about(ABOUT)
+        .about("Get file access control lists")
         .override_usage(USAGE)
         .arg(
             Arg::new("access")
