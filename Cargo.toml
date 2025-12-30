@@ -107,6 +107,7 @@ required-features = ["uudoc"]
 # release profile), the debug info and the stack traces will still be available.
 [profile.release]
 lto = true
+codegen-units = 1
 
 # A release-like profile that is tuned to be fast, even when being fast
 # compromises on binary size. This includes aborting on panic.
