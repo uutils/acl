@@ -46,9 +46,11 @@ fn test_acl_binary_write_error_to_dev_full_no_panic() {
     // The command should NOT panic with SIGABRT (exit code 134)
     // A panic would cause SIGABRT which typically results in exit code 134
     let code = result.code().unwrap_or(0);
-    assert_ne!(code, 134,
+    assert_ne!(
+        code, 134,
         "acl binary panicked when writing to /dev/full (exit code 134/SIGABRT). \
-         This means println! macros or .unwrap()/.expect() on write operations are still being used.");
+         This means println! macros or .unwrap()/.expect() on write operations are still being used."
+    );
 
     // If we get here without panicking, the test passes
 }
