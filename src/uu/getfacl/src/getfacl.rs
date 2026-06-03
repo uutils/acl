@@ -9,7 +9,7 @@ use std::os::unix::fs::{MetadataExt, PermissionsExt};
 use uucore::error::UResult;
 use uzers::{get_group_by_gid, get_user_by_uid};
 
-fn print_file_acl(file_path: &str) -> std::io::Result<()> {
+fn print_file_acl(file_path: &str, omit_header: bool) -> std::io::Result<()> {
     let metadata = fs::metadata(file_path)?;
 
     // Fetching owner and group names
@@ -43,9 +43,11 @@ fn print_file_acl(file_path: &str) -> std::io::Result<()> {
     );
 
     // Generating the output
-    println!("# file: {file_path}");
-    println!("# owner: {owner}");
-    println!("# group: {group}");
+    if !omit_header {
+        println!("# file: {file_path}");
+        println!("# owner: {owner}");
+        println!("# group: {group}");
+    }
     println!("user::{user_perms}");
     println!("group::{group_perms}");
     println!("other::{other_perms}");
@@ -57,10 +59,13 @@ fn print_file_acl(file_path: &str) -> std::io::Result<()> {
 pub fn uumain(args: impl uucore::Args) -> UResult<()> {
     let matches = uu_app().try_get_matches_from(args)?;
 
+    // Get the omit-header flag value
+    let omit_header = matches.get_flag("omit-header");
+
     // Example: Handle file arguments
     if let Some(files) = matches.get_many::<String>("file") {
         for file in files {
-            print_file_acl(file)?;
+            print_file_acl(file, omit_header)?;
 
             // Implement the logic to fetch and display the ACLs using xattr
             match xattr::list(file) {
@@ -109,6 +114,7 @@ pub fn uu_app() -> Command {
             Arg::new("omit-header")
                 .short('c')
                 .long("omit-header")
+                .action(ArgAction::SetTrue)
                 .help("Do not display the comment header"),
         )
         .arg(
