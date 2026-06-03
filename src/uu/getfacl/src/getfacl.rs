@@ -9,17 +9,8 @@ use std::os::unix::fs::{MetadataExt, PermissionsExt};
 use uucore::error::UResult;
 use uzers::{get_group_by_gid, get_user_by_uid};
 
-fn print_file_acl(file_path: &str, omit_header: bool) -> std::io::Result<()> {
+fn print_file_acl(file_path: &str) -> std::io::Result<()> {
     let metadata = fs::metadata(file_path)?;
-
-    // Fetching owner and group names
-    let owner = get_user_by_uid(metadata.uid())
-        .map(|u| u.name().to_string_lossy().into_owned())
-        .unwrap_or_else(|| "unknown".to_string());
-    let group = get_group_by_gid(metadata.gid())
-        .map(|g| g.name().to_string_lossy().into_owned())
-        .unwrap_or_else(|| "unknown".to_string());
-
     // Fetching and formatting file permissions
     let perms = metadata.permissions();
     let mode = perms.mode();
@@ -42,16 +33,51 @@ fn print_file_acl(file_path: &str, omit_header: bool) -> std::io::Result<()> {
         if mode & 0o001 != 0 { "x" } else { "-" }
     );
 
-    // Generating the output
-    if !omit_header {
-        println!("# file: {file_path}");
-        println!("# owner: {owner}");
-        println!("# group: {group}");
-    }
     println!("user::{user_perms}");
     println!("group::{group_perms}");
     println!("other::{other_perms}");
 
+    Ok(())
+}
+
+fn print_header(file_path: &str) -> std::io::Result<()> {
+    let metadata = fs::metadata(file_path)?;
+
+    // Fetching owner and group names
+    let owner = get_user_by_uid(metadata.uid())
+        .map(|u| u.name().to_string_lossy().into_owned())
+        .unwrap_or_else(|| "unknown".to_string());
+    let group = get_group_by_gid(metadata.gid())
+        .map(|g| g.name().to_string_lossy().into_owned())
+        .unwrap_or_else(|| "unknown".to_string());
+
+    println!("# file: {file_path}");
+    println!("# owner: {owner}");
+    println!("# group: {group}");
+
+    Ok(())
+}
+
+fn print_customized_output(
+    file_path: &str,
+    args_present: bool,
+    omit_header: bool,
+    access: bool,
+) -> std::io::Result<()> {
+    if !omit_header {
+        print_header(file_path)?;
+    }
+
+    if args_present || access {
+        print_file_acl(file_path)?;
+    }
+
+    Ok(())
+}
+
+fn print_default_output(file_path: &str) -> std::io::Result<()> {
+    print_header(file_path)?;
+    print_file_acl(file_path)?;
     Ok(())
 }
 
@@ -61,11 +87,30 @@ pub fn uumain(args: impl uucore::Args) -> UResult<()> {
 
     // Get the omit-header flag value
     let omit_header = matches.get_flag("omit-header");
+    let access = matches.get_flag("access");
+
+    // Check if any non-file arguments were passed
+    let args_present = omit_header
+        || access
+        || matches.contains_id("default")
+        || matches.contains_id("all-effective")
+        || matches.contains_id("no-effective")
+        || matches.contains_id("skip-base")
+        || matches.contains_id("recursive")
+        || matches.contains_id("logical")
+        || matches.contains_id("physical")
+        || matches.contains_id("tabular")
+        || matches.contains_id("absolute-names")
+        || matches.contains_id("numeric");
 
     // Example: Handle file arguments
     if let Some(files) = matches.get_many::<String>("file") {
         for file in files {
-            print_file_acl(file, omit_header)?;
+            if !args_present {
+                print_default_output(file)?;
+            } else {
+                print_customized_output(file, args_present, omit_header, access)?;
+            }
 
             // Implement the logic to fetch and display the ACLs using xattr
             match xattr::list(file) {
@@ -85,6 +130,7 @@ pub fn uumain(args: impl uucore::Args) -> UResult<()> {
                 }
                 Err(e) => println!("Error listing attributes for file {file}: {e}"),
             }
+            println!();
         }
     }
 
@@ -102,6 +148,7 @@ pub fn uu_app() -> Command {
             Arg::new("access")
                 .short('a')
                 .long("access")
+                .action(ArgAction::SetTrue)
                 .help("Display the file access control list"),
         )
         .arg(
