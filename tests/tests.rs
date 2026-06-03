@@ -4,6 +4,7 @@
 // file that was distributed with this source code.
 
 use std::env;
+use uutests::new_ucmd;
 
 pub const TESTS_BINARY: &str = env!("CARGO_BIN_EXE_acl");
 
@@ -14,6 +15,12 @@ fn init() {
         // Necessary for uutests to be able to find the binary
         std::env::set_var("UUTESTS_BINARY_PATH", TESTS_BINARY);
     }
+}
+
+#[test]
+fn test_println_panic() {
+    // This test is to ensure that println!() does not panic when it is unable to write to stdout
+    new_ucmd!().arg("> /dev/full").fails().code_is(1);
 }
 
 #[cfg(feature = "chacl")]

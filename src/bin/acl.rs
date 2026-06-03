@@ -20,15 +20,17 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 include!(concat!(env!("OUT_DIR"), "/uutils_map.rs"));
 
 fn usage<T>(utils: &UtilityMap<T>, name: &str) {
-    println!("{name} {VERSION} (multi-call binary)\n");
-    println!("Usage: {name} [function [arguments...]]\n");
-    println!("Currently defined functions:\n");
+    let mut stdout = io::stdout();
+    let _ = writeln!(stdout, "{name} {VERSION} (multi-call binary)\n");
+    let _ = writeln!(stdout, "Usage: {name} [function [arguments...]]\n");
+    let _ = writeln!(stdout, "Currently defined functions:\n");
     #[allow(clippy::map_clone)]
     let mut utils: Vec<&str> = utils.keys().map(|&s| s).collect();
     utils.sort_unstable();
     let display_list = utils.join(", ");
     let width = cmp::min(textwrap::termwidth(), 100) - 4 * 2; // (opinion/heuristic) max 100 chars wide with 4 character side indentions
-    println!(
+    let _ = writeln!(
+        stdout,
         "{}",
         textwrap::indent(&textwrap::fill(&display_list, width), "    ")
     );
@@ -81,7 +83,12 @@ fn main() {
     // 0th argument equals util name?
     if let Some(util_os) = util_name {
         fn not_found(util: &OsStr) -> ! {
-            println!("{}: function/utility not found", util.maybe_quote());
+            let _ = writeln!(
+                io::stdout(),
+                "{}: function/utility not found",
+                util.maybe_quote()
+            );
+
             process::exit(1);
         }
 
