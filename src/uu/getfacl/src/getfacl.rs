@@ -3,7 +3,7 @@
 // For the full copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-use clap::{Arg, ArgAction, Command, crate_version, ArgMatches};
+use clap::{Arg, ArgAction, ArgMatches, Command, crate_version};
 use std::fs::{self, Metadata};
 use std::os::unix::fs::{MetadataExt, PermissionsExt};
 use uucore::error::UResult;
@@ -28,7 +28,6 @@ impl Config {
 }
 
 fn print_file_acl(metadata: &Metadata) -> std::io::Result<()> {
-
     // Fetching and formatting file permissions
     let perms = metadata.permissions();
     let mode = perms.mode();
@@ -59,7 +58,6 @@ fn print_file_acl(metadata: &Metadata) -> std::io::Result<()> {
 }
 
 fn print_header(file_path: &str, metadata: &Metadata) -> std::io::Result<()> {
-
     // Fetching owner and group names
     let owner = get_user_by_uid(metadata.uid())
         .map(|u| u.name().to_string_lossy().into_owned())
@@ -75,11 +73,7 @@ fn print_header(file_path: &str, metadata: &Metadata) -> std::io::Result<()> {
     Ok(())
 }
 
-fn print_output(
-    file_path: &str,
-    config: &Config,
-    metadata: &Metadata,
-) -> std::io::Result<()> {
+fn print_output(file_path: &str, config: &Config, metadata: &Metadata) -> std::io::Result<()> {
     // Print header unless omitted
     if !config.omit_header {
         print_header(file_path, metadata)?;

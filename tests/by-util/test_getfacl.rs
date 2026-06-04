@@ -56,3 +56,21 @@ fn test_basic_output_with_file_with_omit_header() {
     assert!(stdout.contains("group:"));
     assert!(stdout.contains("other:"));
 }
+
+#[test]
+fn test_basic_output_with_file_with_access_flag() {
+    // Create basic file with default permissions. No ACLs.
+    let scene = TestScenario::new(util_name!());
+    let at = &scene.fixtures;
+    at.touch("test_file");
+
+    let res = scene.ucmd().arg("test_file").arg("-a").succeeds();
+    let stdout = res.no_stderr().stdout_str();
+
+    assert!(stdout.contains("# file: test_file"));
+    assert!(stdout.contains("# owner:"));
+    assert!(stdout.contains("# group:"));
+    assert!(stdout.contains("user:"));
+    assert!(stdout.contains("group:"));
+    assert!(stdout.contains("other:"));
+}
