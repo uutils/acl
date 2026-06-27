@@ -27,7 +27,7 @@ fn init() {
 /// - The command should handle the write error gracefully
 #[test]
 #[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "netbsd"))]
-fn test_acl_binary_write_error_to_dev_full_no_panic() {
+fn test_acl_binary_write_error_no_panic() {
     use std::fs::OpenOptions;
     use std::process::Command;
 
