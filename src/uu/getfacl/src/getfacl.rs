@@ -3,23 +3,31 @@
 // For the full copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-use clap::{Arg, ArgAction, Command, crate_version};
-use std::fs;
+use clap::{Arg, ArgAction, ArgMatches, Command, crate_version};
+use std::fs::{self, Metadata};
 use std::os::unix::fs::{MetadataExt, PermissionsExt};
 use uucore::error::UResult;
 use uzers::{get_group_by_gid, get_user_by_uid};
 
-fn print_file_acl(file_path: &str, omit_header: bool) -> std::io::Result<()> {
-    let metadata = fs::metadata(file_path)?;
+/// Configuration structure to hold all getfacl options
+#[derive(Debug)]
+struct Config {
+    omit_header: bool,
+    show_access: bool,
+}
 
-    // Fetching owner and group names
-    let owner = get_user_by_uid(metadata.uid())
-        .map(|u| u.name().to_string_lossy().into_owned())
-        .unwrap_or_else(|| "unknown".to_string());
-    let group = get_group_by_gid(metadata.gid())
-        .map(|g| g.name().to_string_lossy().into_owned())
-        .unwrap_or_else(|| "unknown".to_string());
+impl Config {
+    /// Create a Config from command-line arguments
+    fn from_matches(matches: &ArgMatches) -> Self {
+        Config {
+            omit_header: matches.get_flag("omit-header"),
+            // Always show access ACL (either by default or when --access flag is set)
+            show_access: true,
+        }
+    }
+}
 
+fn print_file_acl(metadata: &Metadata) -> std::io::Result<()> {
     // Fetching and formatting file permissions
     let perms = metadata.permissions();
     let mode = perms.mode();
@@ -42,15 +50,39 @@ fn print_file_acl(file_path: &str, omit_header: bool) -> std::io::Result<()> {
         if mode & 0o001 != 0 { "x" } else { "-" }
     );
 
-    // Generating the output
-    if !omit_header {
-        println!("# file: {file_path}");
-        println!("# owner: {owner}");
-        println!("# group: {group}");
-    }
     println!("user::{user_perms}");
     println!("group::{group_perms}");
     println!("other::{other_perms}");
+
+    Ok(())
+}
+
+fn print_header(file_path: &str, metadata: &Metadata) -> std::io::Result<()> {
+    // Fetching owner and group names
+    let owner = get_user_by_uid(metadata.uid())
+        .map(|u| u.name().to_string_lossy().into_owned())
+        .unwrap_or_else(|| "unknown".to_string());
+    let group = get_group_by_gid(metadata.gid())
+        .map(|g| g.name().to_string_lossy().into_owned())
+        .unwrap_or_else(|| "unknown".to_string());
+
+    println!("# file: {file_path}");
+    println!("# owner: {owner}");
+    println!("# group: {group}");
+
+    Ok(())
+}
+
+fn print_output(file_path: &str, config: &Config, metadata: &Metadata) -> std::io::Result<()> {
+    // Print header unless omitted
+    if !config.omit_header {
+        print_header(file_path, metadata)?;
+    }
+
+    // Print access ACL if requested as we always show access ACL
+    if config.show_access {
+        print_file_acl(metadata)?;
+    }
 
     Ok(())
 }
@@ -59,13 +91,15 @@ fn print_file_acl(file_path: &str, omit_header: bool) -> std::io::Result<()> {
 pub fn uumain(args: impl uucore::Args) -> UResult<()> {
     let matches = uu_app().try_get_matches_from(args)?;
 
-    // Get the omit-header flag value
-    let omit_header = matches.get_flag("omit-header");
+    // Parse configuration from command-line arguments
+    let config = Config::from_matches(&matches);
 
-    // Example: Handle file arguments
+    // Handle file arguments
     if let Some(files) = matches.get_many::<String>("file") {
         for file in files {
-            print_file_acl(file, omit_header)?;
+            let metadata = fs::metadata(file)?;
+
+            print_output(file, &config, &metadata)?;
 
             // Implement the logic to fetch and display the ACLs using xattr
             match xattr::list(file) {
@@ -85,6 +119,7 @@ pub fn uumain(args: impl uucore::Args) -> UResult<()> {
                 }
                 Err(e) => println!("Error listing attributes for file {file}: {e}"),
             }
+            println!();
         }
     }
 
@@ -102,12 +137,14 @@ pub fn uu_app() -> Command {
             Arg::new("access")
                 .short('a')
                 .long("access")
+                .action(ArgAction::SetTrue)
                 .help("Display the file access control list"),
         )
         .arg(
             Arg::new("default")
                 .short('d')
                 .long("default")
+                .action(ArgAction::SetTrue)
                 .help("Display the default access control list"),
         )
         .arg(
@@ -121,54 +158,63 @@ pub fn uu_app() -> Command {
             Arg::new("all-effective")
                 .short('e')
                 .long("all-effective")
+                .action(ArgAction::SetTrue)
                 .help("Print all effective rights comments"),
         )
         .arg(
             Arg::new("no-effective")
                 .short('E')
                 .long("no-effective")
+                .action(ArgAction::SetTrue)
                 .help("Do not print effective rights comments"),
         )
         .arg(
             Arg::new("skip-base")
                 .short('s')
                 .long("skip-base")
+                .action(ArgAction::SetTrue)
                 .help("Skip files that only have the base ACL entries"),
         )
         .arg(
             Arg::new("recursive")
                 .short('R')
                 .long("recursive")
+                .action(ArgAction::SetTrue)
                 .help("List the ACLs of all files and directories recursively"),
         )
         .arg(
             Arg::new("logical")
                 .short('L')
                 .long("logical")
+                .action(ArgAction::SetTrue)
                 .help("Logical walk, follow symbolic links to directories"),
         )
         .arg(
             Arg::new("physical")
                 .short('P')
                 .long("physical")
+                .action(ArgAction::SetTrue)
                 .help("Physical walk, do not follow symbolic links"),
         )
         .arg(
             Arg::new("tabular")
                 .short('t')
                 .long("tabular")
+                .action(ArgAction::SetTrue)
                 .help("Use an alternative tabular output format"),
         )
         .arg(
             Arg::new("absolute-names")
                 .short('p')
                 .long("absolute-names")
+                .action(ArgAction::SetTrue)
                 .help("Do not strip leading slash characters"),
         )
         .arg(
             Arg::new("numeric")
                 .short('n')
                 .long("numeric")
+                .action(ArgAction::SetTrue)
                 .help("List numeric user and group IDs"),
         )
         .arg(
