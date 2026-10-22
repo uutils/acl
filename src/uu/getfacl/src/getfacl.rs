@@ -14,6 +14,7 @@ use uzers::{get_group_by_gid, get_user_by_uid};
 struct Config {
     omit_header: bool,
     show_access: bool,
+    absolute_names: bool,
 }
 
 impl Config {
@@ -23,6 +24,7 @@ impl Config {
             omit_header: matches.get_flag("omit-header"),
             // Always show access ACL (either by default or when --access flag is set)
             show_access: true,
+            absolute_names: matches.get_flag("absolute-names"),
         }
     }
 }
@@ -55,6 +57,34 @@ fn print_file_acl(metadata: &Metadata) -> std::io::Result<()> {
     println!("other::{other_perms}");
 
     Ok(())
+}
+
+/// Compute the name shown in the `# file:` header.
+///
+/// Like GNU getfacl, unless `--absolute-names` is given, leading slashes are
+/// stripped (with a one-time warning) and a leading `./` is removed. An empty
+/// result is shown as `.`.
+fn display_name<'a>(file_path: &'a str, config: &Config, warned: &mut bool) -> &'a str {
+    if config.absolute_names {
+        return file_path;
+    }
+
+    let name = if file_path.starts_with('/') {
+        if !*warned {
+            eprintln!(
+                "{}: Removing leading '/' from absolute path names",
+                uucore::util_name()
+            );
+            *warned = true;
+        }
+        file_path.trim_start_matches('/')
+    } else if let Some(rest) = file_path.strip_prefix("./") {
+        rest.trim_start_matches('/')
+    } else {
+        file_path
+    };
+
+    if name.is_empty() { "." } else { name }
 }
 
 fn print_header(file_path: &str, metadata: &Metadata) -> std::io::Result<()> {
@@ -93,13 +123,15 @@ pub fn uumain(args: impl uucore::Args) -> UResult<()> {
 
     // Parse configuration from command-line arguments
     let config = Config::from_matches(&matches);
+    let mut warned_absolute = false;
 
     // Handle file arguments
     if let Some(files) = matches.get_many::<String>("file") {
         for file in files {
             let metadata = fs::metadata(file)?;
 
-            print_output(file, &config, &metadata)?;
+            let name = display_name(file, &config, &mut warned_absolute);
+            print_output(name, &config, &metadata)?;
 
             // Implement the logic to fetch and display the ACLs using xattr
             match xattr::list(file) {
