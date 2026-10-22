@@ -74,3 +74,71 @@ fn test_basic_output_with_file_with_access_flag() {
     assert!(stdout.contains("group:"));
     assert!(stdout.contains("other:"));
 }
+
+#[test]
+fn test_strips_leading_slash_by_default() {
+    let scene = TestScenario::new(util_name!());
+    let at = &scene.fixtures;
+    at.touch("test_file");
+    let abs = at.plus_as_string("test_file");
+    assert!(abs.starts_with('/'));
+
+    let res = scene.ucmd().arg(&abs).succeeds();
+    res.stderr_is("getfacl: Removing leading '/' from absolute path names\n");
+    let stdout = res.stdout_str();
+    let expected = format!("# file: {}\n", abs.trim_start_matches('/'));
+    assert!(stdout.contains(&expected), "stdout was: {stdout}");
+}
+
+#[test]
+fn test_leading_slash_warning_printed_once() {
+    let scene = TestScenario::new(util_name!());
+    let at = &scene.fixtures;
+    at.touch("a");
+    at.touch("b");
+
+    scene
+        .ucmd()
+        .arg(at.plus_as_string("a"))
+        .arg(at.plus_as_string("b"))
+        .succeeds()
+        .stderr_is("getfacl: Removing leading '/' from absolute path names\n");
+}
+
+#[test]
+fn test_root_is_shown_as_dot() {
+    let res = new_ucmd!().arg("/").succeeds();
+    res.stderr_is("getfacl: Removing leading '/' from absolute path names\n");
+    assert!(res.stdout_str().starts_with("# file: .\n"));
+}
+
+#[test]
+fn test_absolute_names_keeps_leading_slash() {
+    for flag in ["-p", "--absolute-names"] {
+        let scene = TestScenario::new(util_name!());
+        let at = &scene.fixtures;
+        at.touch("test_file");
+        let abs = at.plus_as_string("test_file");
+
+        let res = scene.ucmd().arg(flag).arg(&abs).succeeds();
+        let stdout = res.no_stderr().stdout_str();
+        assert!(
+            stdout.contains(&format!("# file: {abs}\n")),
+            "stdout was: {stdout}"
+        );
+    }
+}
+
+#[test]
+fn test_relative_name_unchanged() {
+    let scene = TestScenario::new(util_name!());
+    let at = &scene.fixtures;
+    at.touch("test_file");
+
+    let res = scene.ucmd().arg("./test_file").succeeds();
+    let stdout = res.no_stderr().stdout_str();
+    assert!(
+        stdout.contains("# file: test_file\n"),
+        "stdout was: {stdout}"
+    );
+}
