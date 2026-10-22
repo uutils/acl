@@ -88,7 +88,9 @@ fn parse_acl_xattr(value: &[u8]) -> Option<Vec<AclEntry>> {
     }
     Some(
         entries
-            .chunks_exact(8)
+            .as_chunks::<8>()
+            .0
+            .iter()
             .map(|e| AclEntry {
                 tag: u16::from_le_bytes([e[0], e[1]]),
                 perm: u16::from_le_bytes([e[2], e[3]]),
