@@ -196,6 +196,13 @@ fn test_named_entries_and_effective_rights() {
         .args(&["-c", "-E", "test_file"])
         .succeeds()
         .stdout_does_not_contain("#effective");
+
+    // The header drops the leading '/', the ACL is still read from the full path
+    scene
+        .ucmd()
+        .args(&["-c", &at.plus_as_string("test_file")])
+        .succeeds()
+        .stdout_contains(format!("user:{user}:r--\n"));
 }
 
 #[test]
