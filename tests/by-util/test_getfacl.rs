@@ -235,3 +235,19 @@ fn test_default_acl() {
         .succeeds()
         .stdout_is("user::rwx\ngroup::r-x\nother::r-x\n\n");
 }
+
+#[test]
+fn test_missing_file_is_named_and_others_still_listed() {
+    let scene = TestScenario::new(util_name!());
+    let at = &scene.fixtures;
+    at.touch("test_file");
+    at.set_mode("test_file", 0o644);
+
+    scene
+        .ucmd()
+        .args(&["-c", "missing", "test_file"])
+        .fails()
+        .code_is(1)
+        .stderr_is("getfacl: missing: No such file or directory\n")
+        .stdout_is("user::rw-\ngroup::r--\nother::r--\n\n");
+}
