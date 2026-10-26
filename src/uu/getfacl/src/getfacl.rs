@@ -6,7 +6,8 @@
 use clap::{Arg, ArgAction, ArgMatches, Command, crate_version};
 use std::fs::{self, Metadata};
 use std::os::unix::fs::{MetadataExt, PermissionsExt};
-use uucore::error::UResult;
+use uucore::error::{FromIo, UResult};
+use uucore::show;
 use uzers::{get_group_by_gid, get_user_by_uid};
 
 /// Which effective rights comments to print
@@ -253,7 +254,13 @@ pub fn uumain(args: impl uucore::Args) -> UResult<()> {
     // Handle file arguments
     if let Some(files) = matches.get_many::<String>("file") {
         for file in files {
-            let metadata = fs::metadata(file)?;
+            let metadata = match fs::metadata(file) {
+                Ok(metadata) => metadata,
+                Err(e) => {
+                    show!(e.map_err_context(|| file.clone()));
+                    continue;
+                }
+            };
 
             let name = display_name(file, &config, &mut warned_absolute);
             print_output(file, name, &config, &metadata)?;
