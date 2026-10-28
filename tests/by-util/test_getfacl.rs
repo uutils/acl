@@ -142,3 +142,112 @@ fn test_relative_name_unchanged() {
         "stdout was: {stdout}"
     );
 }
+
+/// Little endian POSIX ACL xattr: version 2, then (tag, perm, id) entries
+#[cfg(target_os = "linux")]
+fn acl_xattr(entries: &[(u16, u16, u32)]) -> Vec<u8> {
+    let mut value = 2u32.to_le_bytes().to_vec();
+    for &(tag, perm, id) in entries {
+        value.extend_from_slice(&tag.to_le_bytes());
+        value.extend_from_slice(&perm.to_le_bytes());
+        value.extend_from_slice(&id.to_le_bytes());
+    }
+    value
+}
+
+#[test]
+#[cfg(target_os = "linux")]
+fn test_named_entries_and_effective_rights() {
+    let scene = TestScenario::new(util_name!());
+    let at = &scene.fixtures;
+    at.touch("test_file");
+    // user::rw- user:0:r-- group::rw- group:0:rwx mask::r-- other::r--
+    let acl = acl_xattr(&[
+        (0x01, 6, u32::MAX),
+        (0x02, 4, 0),
+        (0x04, 6, u32::MAX),
+        (0x08, 7, 0),
+        (0x10, 4, u32::MAX),
+        (0x20, 4, u32::MAX),
+    ]);
+    if xattr::set(at.plus("test_file"), "system.posix_acl_access", &acl).is_err() {
+        // The file system has no POSIX ACL support
+        return;
+    }
+    let user = uucore::entries::uid2usr(0).unwrap();
+    let group = uucore::entries::gid2grp(0).unwrap();
+
+    scene
+        .ucmd()
+        .args(&["-c", "test_file"])
+        .succeeds()
+        .stdout_is(format!(
+            "user::rw-\nuser:{user}:r--\ngroup::rw-\t#effective:r--\ngroup:{group}:rwx\t#effective:r--\nmask::r--\nother::r--\n\n"
+        ));
+
+    scene
+        .ucmd()
+        .args(&["-c", "-e", "test_file"])
+        .succeeds()
+        .stdout_contains(format!("user:{user}:r--\t#effective:r--\n"));
+
+    scene
+        .ucmd()
+        .args(&["-c", "-E", "test_file"])
+        .succeeds()
+        .stdout_does_not_contain("#effective");
+
+    // The header drops the leading '/', the ACL is still read from the full path
+    scene
+        .ucmd()
+        .args(&["-c", &at.plus_as_string("test_file")])
+        .succeeds()
+        .stdout_contains(format!("user:{user}:r--\n"));
+}
+
+#[test]
+#[cfg(target_os = "linux")]
+fn test_default_acl() {
+    let scene = TestScenario::new(util_name!());
+    let at = &scene.fixtures;
+    at.mkdir("test_dir");
+    at.set_mode("test_dir", 0o755);
+    let acl = acl_xattr(&[
+        (0x01, 7, u32::MAX),
+        (0x04, 5, u32::MAX),
+        (0x20, 5, u32::MAX),
+    ]);
+    if xattr::set(at.plus("test_dir"), "system.posix_acl_default", &acl).is_err() {
+        return;
+    }
+
+    scene
+        .ucmd()
+        .args(&["-c", "test_dir"])
+        .succeeds()
+        .stdout_is(
+            "user::rwx\ngroup::r-x\nother::r-x\ndefault:user::rwx\ndefault:group::r-x\ndefault:other::r-x\n\n",
+        );
+
+    scene
+        .ucmd()
+        .args(&["-c", "-d", "test_dir"])
+        .succeeds()
+        .stdout_is("user::rwx\ngroup::r-x\nother::r-x\n\n");
+}
+
+#[test]
+fn test_missing_file_is_named_and_others_still_listed() {
+    let scene = TestScenario::new(util_name!());
+    let at = &scene.fixtures;
+    at.touch("test_file");
+    at.set_mode("test_file", 0o644);
+
+    scene
+        .ucmd()
+        .args(&["-c", "missing", "test_file"])
+        .fails()
+        .code_is(1)
+        .stderr_is("getfacl: missing: No such file or directory\n")
+        .stdout_is("user::rw-\ngroup::r--\nother::r--\n\n");
+}
